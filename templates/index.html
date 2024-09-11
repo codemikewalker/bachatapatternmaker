@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <style>
+        .left {
+            background-image: url("{% static 'img/bachata.jpg' %}");
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bachata Pattern Maker</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 vh-100" id="left">
+               
+                <h1 id="title">Bachata Pattern Maker</h1>
+                <p>Welcome to <i>Bachata Pattern Maker App (BPM)</i>. Enter the length of the bachata pattern you would like in  number of 8-count basics. <i>BPM</i> will create a pattern based on the specified length. Each move depends on the preceding move and handhold. </p>
+            
+                
+                <form action="" method="GET">
+                    {% csrf_token %}
+                    {{form}}
+                    <input type="submit" class ="btn btn-secondary" value="Submit">
+                </form>
+            </div> <!-- col end lg-6 -->
+            <div class="col-lg-6">
+                <table class="table">
+                    <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Position</th>
+                          <th scope="col">Starting Handhold</th>
+                          <th scope="col">Ending Handhold</th>
+                          <th scope="col">Move Name</th>
+                        </tr>
+                {%if pattern %}
+                    {% for move in pattern %}
+                        <tr>
+                            <td>
+                            {{move.length}}
+                            </td>
+                            <td>
+                                {{move.position}}
+                            </td>
+                            <td> 
+                                {{move.s_handhold}}
+                            </td>
+                            <td> 
+                                {{move.e_handhold}}
+                            </td>
+                            <td> 
+                                {{move.name}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {%endif%}
+            </table>
+            </div>
+        </div> <!-- row end -->
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body> 
+</html>
