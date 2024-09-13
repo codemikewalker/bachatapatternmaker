@@ -3,6 +3,7 @@ from . import views
 from bpm.form import InputForm
 from django.http import HttpResponse
 import random
+from .models import Move, MoveMatrix
 # Create your views here.
 MOVES = {
     0 : {"name" : 'basic',
@@ -114,14 +115,23 @@ MOVES_BY_HANDHOLDS = {
     9 : [9,10,11]
 }
 
-##current_hh_state = random.choice(list(HANDHOLDS.items()))[0]
-current_hh_state = 4
 
-def nextmove(handhold=4, current_cnt=0):
-    print("handhold: " + str(handhold))
-    next_move_id = random.choice(MOVES_BY_HANDHOLDS[handhold])
-    next_move = MOVES[next_move_id]
-    return next_move
+def nextmove(move=''):
+    if move == '':
+        current_move = Move.objects.all().order_by("?").first()
+        current_handhold = current_move.end_handhold
+        ##move = current_move
+        return current_move
+    else:
+        current_move = move
+        current_handhold = current_move.end_handhold
+        print(current_move.end_handhold)
+        move_matrix = MoveMatrix.objects.filter(handHold=current_handhold) ##Filter to moves with specified handhold 
+        print(move_matrix)
+        next_move_id = move_matrix.order_by("?").first().moveKey_id ##randomly sort and pick first (one) and get the move primary id
+        next_move = Move.objects.filter(id=next_move_id).first()
+        print("Next move:" + next_move.__str__())
+        return next_move
 
 def checkValidMove(move,cnt):
     if move['s_count'] == cnt % 8:
@@ -129,54 +139,68 @@ def checkValidMove(move,cnt):
     else:
         return False
 
+
 def home(request): 
     form = InputForm()
     if(request.GET.get('num_basic_length', None)):
         basic_length = request.GET.get('num_basic_length')
+        contains = request.GET.get('contains')
         n = int(basic_length)*8
         ##moves_len = len(MOVES)
         i = 0
         pattern = []
-        while(i < n):
+        pattern1 = []
+        loop = True
+        while(loop):
+            print("I: " + str(i))
+            ##At the end of the loop, if contains has been set and the pattern has what is in contains then loop = false
+            if(i ==n):
+                if contains != '':
+                    contains_move = Move.objects.get(id=contains)
+                    print(contains_move)
+                    contains_bool = False
+                    for m in pattern:
+                        if m == contains_move:
+                            contains_bool = True
+                    print(contains_bool)
+                    if contains_bool == False:
+                        ##reset all variables
+                        i = 0
+                        pattern = []
+                        pattern1 = []
+                    else:
+                        loop = False
+                    contains_bool
+                else:
+                    loop = False
             ##rand_num = random.randint(0, moves_len-1)
-            if(i == 0):
+            elif(i == 0):
+                ##problem here
                 move = nextmove()
-                print(move)
+                print(move.__str__())
                 pattern.append(move)
+                ##need to change handhold id in Move model to string description
+                move1 = { 'length' : move.length, 'position' : move.position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
+                pattern1.append(move1)
+                i+= move.length
+
             else:
-                print(move)
+                current_move = pattern[len(pattern)-1]
                 ##Check to see if have enough counts left to add next move
                 check = True
                 while(check):
-                    nxt_move = nextmove(handhold=move['e_handhold'],current_cnt=i)
-                    if(nxt_move['length']+ i <= n):
+                    nxt_move = nextmove(current_move)
+                    if(nxt_move.length + i <= n):
                         move = nxt_move
                         check = False
 
                 ##add new move to pattern
+                move1 = { 'length' : move.length, 'position' : move.position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
                 pattern.append(move)
-            i+= move['length']
-        context = {'form' : form, 'pattern' : pattern }
-    else:
-        context = {'form' : form}
-    return render(request, 'index.html', context)
-
-
-def home_view(request): 
-    form = InputForm()
-    if(request.GET.get('num_basic_length', None)):
-        basic_length = request.GET.get('num_basic_length')
-        n = int(basic_length)
-        ##moves_len = len(MOVES)
-        i = 0
-        pattern = []
-        while(i < n):
-            rand_num = random.randint(0, moves_len-1)
-            items = list(MOVES.items())
-            move = random.choice(items)
-            pattern.append(move[1])
-            i+=1
-        context = {'form' : form, 'pattern' : pattern }
+                pattern1.append(move1)
+                print(pattern)
+                i+= move.length
+        context = {'form' : form, 'pattern' : pattern1 }
     else:
         context = {'form' : form}
     return render(request, 'index.html', context)

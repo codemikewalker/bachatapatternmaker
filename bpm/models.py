@@ -5,13 +5,16 @@ import random
 # Create your models here.
 
 class HandHold(models.Model):        
-    LIST_HANDHOLDS = (('h1','H1'), ('h2,','H2'))
+    LIST_HANDHOLDS = (('h1','H1'), ('h2','H2'))
 
     handhold = models.CharField(max_length=25,choices=LIST_HANDHOLDS)
     description = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return self.handhold
+        return self.description
+    
+
+    
 
 class Move(models.Model):
     ##
@@ -21,10 +24,10 @@ class Move(models.Model):
     9 : [9,10,11]
 }
 
-    LIST_HANDHOLDS = (('h1','H1'), ('h2,','H2'))
+    ##LIST_HANDHOLDS = (('h1','H1'), ('h2,','H2'))
     LIST_POSITIONS = (('open','Open'), ('open_palm','Open Palm'), ('sensual','Sensual'), ('close','Close'))
     LIST_LEVELS = (('Beginner',"Beginner"),('Beginner Advanced',"Beginner Advanced"))
-    LIST_COUNTS = ((1,1), (2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8))
+    ##LIST_COUNTS = ((1,1), (2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8))
 
     name = models.CharField(max_length=100)
     length = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(8)],default=4)
@@ -43,15 +46,24 @@ class Move(models.Model):
 
     def __str__(self):
         return self.name
-
-
     
-    def nextmove( handhold='h1', current_cnt=0):
+    def get_length(self):
+        return self.length
+
+    def get_start_handhold_desc(self):
+        return self.start_handhold.description
+        
+"""   
+    def nextmove(self, handhold='', current_cnt=0):
         print("handhold: " + str(handhold))
+        self.end_handhold
+        if handhold == '':
+            handhold = HandHold.objects.filter(handhold='h1')
+
         move_matrix = MoveMatrix.objects.filter(handhold=handhold) ##Filter to moves with specified handhold 
         next_move_id = move_matrix.order_by("?").first().moveKey ##randomly sort and pick first (one) and get the move primary id
         next_move = Move.objects.filter(id=next_move_id)
-        return next_move
+        return next_move """
 
 
 class MoveMatrix(models.Model):

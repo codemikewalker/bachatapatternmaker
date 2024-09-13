@@ -32,26 +32,23 @@
                 <table class="table">
                     <thead>
                         <tr>
-                          <th scope="col">#</th>
                           <th scope="col">Position</th>
-                          <th scope="col">Starting Handhold</th>
-                          <th scope="col">Ending Handhold</th>
+                          <th scope="col">Starting Handhold<br>(Leader's Perspective)</th>
+                          <th scope="col">Ending Handhold<br>(Leader's Perspective)</th>
                           <th scope="col">Move Name</th>
                         </tr>
                 {%if pattern %}
                     {% for move in pattern %}
                         <tr>
-                            <td>
-                            {{move.length}}
-                            </td>
+                            
                             <td>
                                 {{move.position}}
                             </td>
                             <td> 
-                                {{move.s_handhold}}
+                                {{move.start_handhold}}
                             </td>
                             <td> 
-                                {{move.e_handhold}}
+                                {{move.end_handhold}}
                             </td>
                             <td> 
                                 {{move.name}}
