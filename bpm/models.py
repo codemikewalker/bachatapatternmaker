@@ -12,6 +12,9 @@ class HandHold(models.Model):
 
     def __str__(self):
         return self.description
+
+class Position(models.Model):
+    name = models.CharField(max_length=25)
     
 
     
@@ -32,7 +35,7 @@ class Move(models.Model):
     name = models.CharField(max_length=100)
     length = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(8)],default=4)
     position = models.CharField(max_length=100,choices=LIST_POSITIONS)
-
+    new_position = models.ForeignKey
     ##Note -> reverse accessor error for s_handhold and e_handhold. adding related_name field fixed problem
     ##Since I added these after the model was created,..
     start_handhold = models.ForeignKey(HandHold,related_name='s_handhold', on_delete=models.CASCADE, null=True)
