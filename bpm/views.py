@@ -125,8 +125,9 @@ def nextmove(move=''):
     else:
         current_move = move
         current_handhold = current_move.end_handhold
+        current_position = current_move.new_position
         print(current_move.end_handhold)
-        move_matrix = MoveMatrix.objects.filter(handHold=current_handhold) ##Filter to moves with specified handhold 
+        move_matrix = MoveMatrix.objects.filter(handHold=current_handhold,position=current_position) ##Filter to moves with specified handhold and position
         print(move_matrix)
         next_move_id = move_matrix.order_by("?").first().moveKey_id ##randomly sort and pick first (one) and get the move primary id
         next_move = Move.objects.filter(id=next_move_id).first()
@@ -180,7 +181,8 @@ def home(request):
                 print(move.__str__())
                 pattern.append(move)
                 ##need to change handhold id in Move model to string description
-                move1 = { 'length' : move.length, 'position' : move.position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
+                ##how to connect this elif with else statement so changes in one affect the other. if i change move.position to move.new_position here, I also have to do it in the else statement
+                move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
                 pattern1.append(move1)
                 i+= move.length
 
@@ -195,7 +197,7 @@ def home(request):
                         check = False
 
                 ##add new move to pattern
-                move1 = { 'length' : move.length, 'position' : move.position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
+                move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
                 pattern.append(move)
                 pattern1.append(move1)
                 print(pattern)

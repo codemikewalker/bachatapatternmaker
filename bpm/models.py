@@ -16,6 +16,8 @@ class HandHold(models.Model):
 class Position(models.Model):
     name = models.CharField(max_length=25)
 
+    def __str__(self):
+        return self.name
 
     
 
@@ -72,6 +74,7 @@ class Move(models.Model):
 class MoveMatrix(models.Model):
     handHold = models.ForeignKey(HandHold, on_delete=models.CASCADE)
     moveKey = models.ForeignKey(Move, on_delete=models.CASCADE)
+    position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True)
 
     
 
