@@ -36,7 +36,7 @@ class Move(models.Model):
 
     name = models.CharField(max_length=100)
     length = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(8)],default=4)
-    position = models.CharField(max_length=100,choices=LIST_POSITIONS)
+    ##position = models.CharField(max_length=100,choices=LIST_POSITIONS)
     new_position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True)
     ##Note -> reverse accessor error for s_handhold and e_handhold. adding related_name field fixed problem
     ##Since I added these after the model was created,..
@@ -76,5 +76,7 @@ class MoveMatrix(models.Model):
     moveKey = models.ForeignKey(Move, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True)
 
+    def __str__(self) -> str:
+        return self.position.__str__() + ' , ' + self.moveKey.__str__()
     
 
