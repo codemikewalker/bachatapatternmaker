@@ -7,7 +7,8 @@ import random
 class HandHold(models.Model):        
     LIST_HANDHOLDS = (('h1','H1'), ('h2','H2'))
 
-    handhold = models.CharField(max_length=25,choices=LIST_HANDHOLDS)
+    ##handhold = models.CharField(max_length=25,choices=LIST_HANDHOLDS)
+    handhold = models.CharField(max_length=25)
     description = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
@@ -75,8 +76,8 @@ class MoveMatrix(models.Model):
     handHold = models.ForeignKey(HandHold, on_delete=models.CASCADE)
     moveKey = models.ForeignKey(Move, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True)
-
+    count = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(8)],default=0)
     def __str__(self) -> str:
-        return self.position.__str__() + ' , ' + self.moveKey.__str__()
+        return self.position.__str__() + ' , ' + self.moveKey.__str__() 
     
 

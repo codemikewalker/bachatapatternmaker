@@ -115,7 +115,8 @@ MOVES_BY_HANDHOLDS = {
     9 : [9,10,11]
 }
 
-
+## Cnt => 0 means the move can go on 1 or 8 else cnt is
+## 
 def nextmove(move=''):
     if move == '':
         current_move = Move.objects.all().order_by("?").first()
@@ -126,7 +127,7 @@ def nextmove(move=''):
         current_move = move
         current_handhold = current_move.end_handhold
         current_position = current_move.new_position
-        print(current_move.end_handhold)
+        print(current_move.end_handhold)    
         move_matrix = MoveMatrix.objects.filter(handHold=current_handhold,position=current_position) ##Filter to moves with specified handhold and position
         print(move_matrix)
         next_move_id = move_matrix.order_by("?").first().moveKey_id ##randomly sort and pick first (one) and get the move primary id
@@ -143,8 +144,8 @@ def checkValidMove(move,cnt):
 
 def home(request): 
     form = InputForm()
-    if(request.GET.get('num_basic_length', None)):
-        basic_length = request.GET.get('num_basic_length')
+    if(request.GET.get('length', None)):
+        basic_length = request.GET.get('length')
         contains = request.GET.get('contains')
         n = int(basic_length)*8
         ##moves_len = len(MOVES)
