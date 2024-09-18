@@ -147,6 +147,8 @@ def home(request):
     if(request.GET.get('length', None)):
         basic_length = request.GET.get('length')
         contains = request.GET.get('contains')
+        startsWith = request.GET.get('startsWith')
+
         n = int(basic_length)*8
         ##moves_len = len(MOVES)
         i = 0
@@ -180,12 +182,25 @@ def home(request):
                 ##problem here
                 move = nextmove()
                 print(move.__str__())
-                pattern.append(move)
-                ##need to change handhold id in Move model to string description
-                ##how to connect this elif with else statement so changes in one affect the other. if i change move.position to move.new_position here, I also have to do it in the else statement
-                move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
-                pattern1.append(move1)
-                i+= move.length
+                if startsWith != '':
+                    if move == Move.objects.get(id=startsWith):
+                        ## B 
+                        pattern.append(move)
+                        ##need to change handhold id in Move model to string description
+                        ##how to connect this elif with else statement so changes in one affect the other. if i change move.position to move.new_position here, I also have to do it in the else statement
+                        move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
+                        pattern1.append(move1)
+                        i+= move.length
+                    
+
+                else:
+                    ## B
+                    pattern.append(move)
+                    ##need to change handhold id in Move model to string description
+                    ##how to connect this elif with else statement so changes in one affect the other. if i change move.position to move.new_position here, I also have to do it in the else statement
+                    move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
+                    pattern1.append(move1)
+                    i+= move.length
 
             else:
                 current_move = pattern[len(pattern)-1]
