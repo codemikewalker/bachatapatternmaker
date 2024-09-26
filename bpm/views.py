@@ -216,7 +216,6 @@ def home(request):
                 move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
                 pattern.append(move)
                 pattern1.append(move1)
-                print(pattern)
                 i+= move.length
         context = {'form' : form, 'pattern' : pattern1 }
     else:
