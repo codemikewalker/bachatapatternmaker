@@ -3,7 +3,7 @@ from . import views
 from bpm.form import InputForm
 from django.http import HttpResponse
 import random
-from .models import Move, MoveMatrix
+from .models import Move, MoveMatrix, Pattern
 # Create your views here.
 MOVES = {
     0 : {"name" : 'basic',
@@ -142,7 +142,7 @@ def checkValidMove(move,cnt):
         return False
 
 
-def home(request): 
+def old_home(request): 
     form = InputForm()
     if(request.GET.get('length', None)):
         basic_length = request.GET.get('length')
@@ -218,6 +218,24 @@ def home(request):
                 pattern1.append(move1)
                 i+= move.length
         context = {'form' : form, 'pattern' : pattern1 }
+    else:
+        context = {'form' : form}
+    return render(request, 'index.html', context)
+
+
+def home(request): 
+    form = InputForm()
+    if(request.GET.get('length', None)):
+        basic_length = request.GET.get('length')
+        contains = request.GET.get('contains')
+        startsWith = request.GET.get('startsWith')
+
+        pattern = Pattern()
+        pattern.createPattern(basic_length=basic_length, contains=contains, startsWith=startsWith)
+
+        
+        context = {'form' : form, 'pattern' : pattern.getPatternDict() }
+        pattern.reset()
     else:
         context = {'form' : form}
     return render(request, 'index.html', context)

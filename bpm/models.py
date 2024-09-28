@@ -81,3 +81,118 @@ class MoveMatrix(models.Model):
         return self.position.__str__() + ' , ' + self.moveKey.__str__() 
     
 
+class Pattern():
+    pattern = []
+    pattern_length = 0
+    pattern_dict = []
+    i = 0
+    def __init__(self):
+        self.pattern = []   
+        self.pattern_length = 0
+        self.i = 0
+        return 
+    
+    def __str__(self):
+        return self.pattern
+    
+    def addMove(self, Move):
+        self.pattern.append(Move)
+        self.pattern_length += 1
+
+        move_dict = { 'length' : Move.length, 'position' : Move.new_position, 'name' : Move.name, 'start_handhold' : Move.get_start_handhold_desc(), 'end_handhold' : Move.end_handhold.description}
+        self.pattern_dict.append(move_dict)
+        self.i+= Move.length
+
+        return
+
+    def reset(self):
+        self.pattern = []
+        self.pattern_dict = []
+        self.i = 0
+        return 
+    
+    def getPattern(self):
+        return self.pattern
+    
+    def getPatternDict(self):
+        return self.pattern_dict
+    
+    def getLastMove(self):
+        if len(self.pattern) > 0:
+            return self.pattern[len(self.pattern) - 1]
+        else:
+            return None
+        
+    def nextMove(self):
+        move = ''
+        if len(self.pattern) > 0:
+            move = self.getLastMove() ##get the last move in the pattern
+
+        if move == '':
+            current_move = Move.objects.all().order_by("?").first()
+            current_handhold = current_move.end_handhold
+            ##move = current_move
+            return current_move
+        else:
+            current_move = move
+            current_handhold = current_move.end_handhold
+            current_position = current_move.new_position
+            ##print(current_move.end_handhold)    
+            move_matrix = MoveMatrix.objects.filter(handHold=current_handhold,position=current_position) ##Filter to moves with specified handhold and position
+            ##print(move_matrix)
+            next_move_id = move_matrix.order_by("?").first().moveKey_id ##randomly sort and pick first (one) and get the move primary id
+            next_move = Move.objects.filter(id=next_move_id).first()
+            return next_move
+
+
+    def createPattern(self, basic_length, contains='', startsWith=''):
+        n = int(basic_length)*8
+        ##moves_len = len(MOVES)
+        ##i = 0
+        loop = True
+        while(loop):
+            ##print("I: " + str(i))
+            ##At the end of the loop, if contains has been set and the pattern has what is in contains then loop = false
+            if(self.i ==n):
+                if contains != '':
+                    contains_move = Move.objects.get(id=contains)
+                    ##print(contains_move)
+                    contains_bool = False
+                    for m in self.pattern:
+                        if m == contains_move:
+                            contains_bool = True
+                    ##print(contains_bool)
+                    if contains_bool == False:
+                        ##reset all variables
+                        self.reset()
+                    else:
+                        loop = False
+                    contains_bool
+                else:
+                    loop = False
+            ##rand_num = random.randint(0, moves_len-1)
+            elif(self.i == 0):
+                ##problem here
+                move = self.nextMove()
+                ##print(move.__str__())
+                if startsWith != '':
+                    if move == Move.objects.get(id=startsWith):
+                        ## B 
+                        self.addMove(move)                                       
+
+                else:
+                    ## B
+                    self.addMove(move)
+
+            else:
+                current_move = self.getLastMove()
+                ##Check to see if have enough counts left to add next move
+                check = True
+                while(check):
+                    nxt_move = self.nextMove()
+                    if(nxt_move.length + self.i <= n):
+                        move = nxt_move
+                        check = False
+
+                    self.addMove(nxt_move)
+                    
