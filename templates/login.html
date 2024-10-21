@@ -1,0 +1,50 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <style>
+        .left {
+            background-image: url("{% static 'img/bachata.jpg' %}");
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bachata Pattern Maker</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-5 vh-100" id="left">
+               
+                <h1 id="title">Bachata Pattern Maker</h1>
+                <p>Welcome to <i>Bachata Pattern Maker App (BPM)</i>. Enter the length of the bachata pattern you would like in  number of 8-count basics. <i>BPM</i> will create a pattern based on the specified length. Each move depends on the preceding move and handhold. </p>
+            
+                
+                
+            </div> <!-- col end lg-6 -->
+            <div class="col-lg-7 col-12 vh-100">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{form}}
+                    <input type="submit" class ="btn btn-secondary" value="Sign In">
+                </form>
+            </div>
+        </div> <!-- row end -->
+        
+    </div>
+    <footer class="footer fixed-bottom"  id="right">
+        <div class="container text-center">
+            <span class="text-white">
+                Contact me at codemikewalker@gmail.com for assistance or suggestions
+            </span>
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body> 
+</html>

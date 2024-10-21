@@ -1,9 +1,16 @@
 from django.shortcuts import render
 from . import views
-from bpm.form import InputForm
+from bpm.form import InputForm, LoginForm
 from django.http import HttpResponse
 import random
 from .models import Move, MoveMatrix, Pattern
+import logging
+from django.core.cache import cache
+from django.views.decorators.cache import never_cache
+
+ 
+
+
 # Create your views here.
 MOVES = {
     0 : {"name" : 'basic',
@@ -140,103 +147,50 @@ def checkValidMove(move,cnt):
         return True 
     else:
         return False
+    
 
-
-def old_home(request): 
-    form = InputForm()
-    if(request.GET.get('length', None)):
-        basic_length = request.GET.get('length')
-        contains = request.GET.get('contains')
-        startsWith = request.GET.get('startsWith')
-
-        n = int(basic_length)*8
-        ##moves_len = len(MOVES)
-        i = 0
-        pattern = []
-        pattern1 = []
-        loop = True
-        while(loop):
-            print("I: " + str(i))
-            ##At the end of the loop, if contains has been set and the pattern has what is in contains then loop = false
-            if(i ==n):
-                if contains != '':
-                    contains_move = Move.objects.get(id=contains)
-                    print(contains_move)
-                    contains_bool = False
-                    for m in pattern:
-                        if m == contains_move:
-                            contains_bool = True
-                    print(contains_bool)
-                    if contains_bool == False:
-                        ##reset all variables
-                        i = 0
-                        pattern = []
-                        pattern1 = []
-                    else:
-                        loop = False
-                    contains_bool
-                else:
-                    loop = False
-            ##rand_num = random.randint(0, moves_len-1)
-            elif(i == 0):
-                ##problem here
-                move = nextmove()
-                print(move.__str__())
-                if startsWith != '':
-                    if move == Move.objects.get(id=startsWith):
-                        ## B 
-                        pattern.append(move)
-                        ##need to change handhold id in Move model to string description
-                        ##how to connect this elif with else statement so changes in one affect the other. if i change move.position to move.new_position here, I also have to do it in the else statement
-                        move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
-                        pattern1.append(move1)
-                        i+= move.length
-                    
-
-                else:
-                    ## B
-                    pattern.append(move)
-                    ##need to change handhold id in Move model to string description
-                    ##how to connect this elif with else statement so changes in one affect the other. if i change move.position to move.new_position here, I also have to do it in the else statement
-                    move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
-                    pattern1.append(move1)
-                    i+= move.length
-
-            else:
-                current_move = pattern[len(pattern)-1]
-                ##Check to see if have enough counts left to add next move
-                check = True
-                while(check):
-                    nxt_move = nextmove(current_move)
-                    if(nxt_move.length + i <= n):
-                        move = nxt_move
-                        check = False
-
-                ##add new move to pattern
-                move1 = { 'length' : move.length, 'position' : move.new_position, 'name' : move.name, 'start_handhold' : move.get_start_handhold_desc(), 'end_handhold' : move.end_handhold.description}
-                pattern.append(move)
-                pattern1.append(move1)
-                i+= move.length
-        context = {'form' : form, 'pattern' : pattern1 }
-    else:
+def login(request):
+    form = LoginForm()
+    if form.is_valid():
         context = {'form' : form}
-    return render(request, 'index.html', context)
+        return render(request, 'login.html', context)
+    else:
+        context = {'form': form, 'error': 'something went wrong'}
+        return render(request, 'login.html', context)
 
 
+logger = logging.getLogger(__name__)
+
+@never_cache
 def home(request): 
     form = InputForm()
+
+
     if(request.GET.get('length', None)):
         basic_length = request.GET.get('length')
         contains = request.GET.get('contains')
         startsWith = request.GET.get('startsWith')
 
+        ##logger.debug("Received request with length: %s, contains: %s, startsWith: %s", basic_length, contains, startsWith)
+        
         pattern = Pattern()
         pattern.createPattern(basic_length=basic_length, contains=contains, startsWith=startsWith)
+        print('Pattern:' + str(pattern.getPatternDict()))
 
-        
+        logger.info("Pattern created: %s", pattern.getPatternDict())
+
+
         context = {'form' : form, 'pattern' : pattern.getPatternDict() }
         pattern.reset()
+        print('Pattern Reset:' + str(pattern.getPatternDict()))
+
+        logger.info("Pattern reset: %s", pattern.getPatternDict())
+
     else:
         context = {'form' : form}
+        print("else")
+
+        logger.debug("No pattern generated, form displayed")
+
     return render(request, 'index.html', context)
 

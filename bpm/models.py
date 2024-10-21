@@ -82,13 +82,11 @@ class MoveMatrix(models.Model):
     
 
 class Pattern():
-    pattern = []
-    pattern_length = 0
-    pattern_dict = []
-    i = 0
+  
+
     def __init__(self):
         self.pattern = []   
-        self.pattern_length = 0
+        self.pattern_dict = []
         self.i = 0
         return 
     
@@ -97,18 +95,21 @@ class Pattern():
     
     def addMove(self, Move):
         self.pattern.append(Move)
-        self.pattern_length += 1
-
         move_dict = { 'length' : Move.length, 'position' : Move.new_position, 'name' : Move.name, 'start_handhold' : Move.get_start_handhold_desc(), 'end_handhold' : Move.end_handhold.description}
         self.pattern_dict.append(move_dict)
         self.i+= Move.length
-
         return
 
     def reset(self):
         self.pattern = []
+        ##self.pattern.clear()
         self.pattern_dict = []
+        ##self.pattern_dict.clear()
         self.i = 0
+        print('Reset')
+        print(self.getPatternDict())
+        print(self.getPatternLength())
+
         return 
     
     def getPattern(self):
@@ -122,6 +123,9 @@ class Pattern():
             return self.pattern[len(self.pattern) - 1]
         else:
             return None
+        
+    def getPatternLength(self):
+        return self.i
         
     def nextMove(self):
         move = ''
